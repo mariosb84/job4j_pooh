@@ -15,8 +15,24 @@ public class Req {
     }
 
     public static Req of(String content) {
-        /* TODO parse a content */
-        return new Req(null, null, null, null);
+        String[] splitHttpRequestType = content.split("HTTP/1.1");
+        String[] splitSlash = splitHttpRequestType[0].split("/");
+        String recType = "GET";
+        if (splitSlash[0].contains("POST")) {
+            recType = "POST";
+        }
+        String mode = "queue";
+        if (splitSlash[1].contains("topic")) {
+            mode = "topic";
+        }
+        String name = splitSlash[2].trim();
+        String param = "";
+        if (recType.equals("POST")) {
+            String[] splitText = content.split("/");
+            String[] rawMessage = splitText[splitText.length - 1].split("\n");
+            param = rawMessage[2];
+        }
+        return new Req(recType, mode, name, param);
     }
 
     public String httpRequestType() {
