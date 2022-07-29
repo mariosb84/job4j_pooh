@@ -29,8 +29,11 @@ public class Req {
         String param = "";
         if (recType.equals("POST")) {
             String[] splitText = content.split("/");
-            String[] rawMessage = splitText[splitText.length - 1].split("\n");
-            param = rawMessage[2];
+            String[] messages = splitText[splitText.length - 1].split("\n");
+            param = messages[2].trim();
+        }
+        if (recType.equals("GET") && (splitSlash.length >= 4)) {
+           param = splitSlash[3].trim();
         }
         return new Req(recType, mode, name, param);
     }
