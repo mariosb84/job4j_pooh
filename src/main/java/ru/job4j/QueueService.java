@@ -12,16 +12,10 @@ public class QueueService implements Service {
         String status = "200";
         ConcurrentLinkedQueue<String> linkedQueue;
         if ("POST".equals(req.httpRequestType())) {
-
-            if (queueMap.containsKey(text)) {
-                linkedQueue = queueMap.get(req.getParam());
-            } else {
-                linkedQueue = new ConcurrentLinkedQueue<>();
-            }
-            linkedQueue.add(req.getParam());
-            queueMap.put(req.getParam(), linkedQueue);
+            queueMap.putIfAbsent(req.getSourceName(), new ConcurrentLinkedQueue<>());
+            queueMap.get(req.getSourceName()).add(req.getParam());
         } else {
-            linkedQueue = queueMap.get(req.getParam());
+            linkedQueue = queueMap.get(req.getSourceName());
             if (linkedQueue == null) {
                 text = "incorrect GET request, no POST found";
                 status = "204";
