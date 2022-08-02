@@ -8,14 +8,15 @@ public class QueueService implements Service {
 
     @Override
     public Resp process(Req req) {
+        String queueName = req.getSourceName();
         String text = req.getParam();
         String status = "200";
         ConcurrentLinkedQueue<String> linkedQueue;
         if ("POST".equals(req.httpRequestType())) {
-            queueMap.putIfAbsent(req.getSourceName(), new ConcurrentLinkedQueue<>());
-            queueMap.get(req.getSourceName()).add(req.getParam());
+            queueMap.putIfAbsent(queueName, new ConcurrentLinkedQueue<>());
+            queueMap.get(queueName).add(req.getParam());
         } else {
-            linkedQueue = queueMap.get(req.getSourceName());
+            linkedQueue = queueMap.get(queueName);
             if (linkedQueue == null) {
                 text = "incorrect GET request, no POST found";
                 status = "204";

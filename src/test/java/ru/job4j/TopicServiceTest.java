@@ -33,4 +33,53 @@ public class TopicServiceTest {
         assertThat(result1.text(), is("temperature=18"));
         assertThat(result2.text(), is(""));
     }
+
+    @Test
+    public void testOfPosting2Messages() {
+        Service service = new TopicService();
+        Req req = new Req("POST", "topic", "weather", "temp=30");
+        Req req2 = new Req("POST", "topic", "weather", "temp=35");
+        Resp resp = service.process(req);
+        Resp resp2 = service.process(req2);
+        assertThat(resp.text(), is("message posted successfully"));
+        assertThat(resp2.text(), is("message posted successfully"));
+    }
+
+    @Test
+    public void testOfPosting2MessagesAnd2GetRequestsWithSameId() {
+        Service service = new TopicService();
+        service.process(new Req("POST", "topic", "weather", "temp=30"));
+        service.process(new Req("POST", "topic", "weather", "temp=35"));
+        Resp resp3 = service.process(new Req("GET", "topic", "weather", ""));
+        Resp resp4 = service.process(new Req("GET", "topic", "weather", ""));
+        assertThat(resp3.text(), is("temp=30"));
+        assertThat(resp4.text(), is("temp=35"));
+    }
+
+    @Test
+    public void testOfPosting2MessagesAnd2GetRequestsWithDiffId() {
+        Service service = new TopicService();
+        service.process(new Req("POST", "topic", "weather", "temp=30"));
+        service.process(new Req("POST", "topic", "weather", "temp=35"));
+        Resp resp3 = service.process(new Req("GET", "topic", "weather", ""));
+        Resp resp4 = service.process(new Req("GET", "topic", "weather", ""));
+        assertThat(resp3.text(), is("temp=30"));
+        assertThat(resp4.text(), is("temp=30"));
+    }
+
+    @Test
+    public void testOfPosting3MessagesDiffThemesAnd4GetRequestsWithDiffId() {
+        Service service = new TopicService();
+        service.process(new Req("POST", "topic", "weather", "temp=30"));
+        service.process(new Req("POST", "topic", "weather", "temp=35"));
+        service.process(new Req("POST", "topic", "season", "summer"));
+        Resp resp3 = service.process(new Req("GET", "topic", "weather", ""));
+        Resp resp4 = service.process(new Req("GET", "topic", "weather", ""));
+        Resp resp5 = service.process(new Req("GET", "topic", "weather", ""));
+        Resp resp6 = service.process(new Req("GET", "topic", "season", ""));
+        assertThat(resp3.text(), is("temp=30"));
+        assertThat(resp4.text(), is("temp=30"));
+        assertThat(resp5.text(), is("temp=35"));
+        assertThat(resp6.text(), is("summer"));
+    }
 }

@@ -21,4 +21,29 @@ public class QueueServiceTest {
         );
         assertThat(result.text(), is("temperature=18"));
     }
+
+    @Test
+    public void testOfPosting2Messages() {
+        Service service = new QueueService();
+        Req req = new Req("POST", "queue", "weather", "temp=30");
+        Req req2 = new Req("POST", "queue", "weather", "temp=35");
+        Resp resp = service.process(req);
+        Resp resp2 = service.process(req2);
+        assertThat(resp.text(), is("temp=30"));
+        assertThat(resp2.text(), is("temp=35"));
+    }
+
+    @Test
+    public void testOfPosting3MessagesDiffThemesAnd3GetRequests() {
+        Service service = new QueueService();
+        service.process(new Req("POST", "queue", "weather", "temp=30"));
+        service.process(new Req("POST", "queue", "weather", "temp=35"));
+        service.process(new Req("POST", "queue", "season", "summer"));
+        Resp resp = service.process(new Req("GET", "queue", "weather", ""));
+        Resp resp2 = service.process(new Req("GET", "queue", "weather", ""));
+        Resp resp3 = service.process(new Req("GET", "queue", "season", ""));
+        assertThat(resp.text(), is("temp=30"));
+        assertThat(resp2.text(), is("temp=35"));
+        assertThat(resp3.text(), is("summer"));
+    }
 }
