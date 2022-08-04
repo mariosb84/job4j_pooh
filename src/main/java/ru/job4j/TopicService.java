@@ -16,10 +16,14 @@ public class TopicService implements Service {
             listMapText = text;
             listMap.put(topicName, listMapText);
         } else {
-                clientMap.putIfAbsent(text, new ConcurrentLinkedQueue<>());
-                listMap.putIfAbsent(topicName, listMapText);
-            clientMap.get(text).add(listMap.get(topicName));
-            text = clientMap.get(text).poll();
+            listMap.putIfAbsent(topicName, listMapText);
+            clientMap.putIfAbsent(text, new ConcurrentLinkedQueue<>());
+            if (clientMap.containsKey(text)) {
+                clientMap.get(text).add(listMap.get(topicName));
+                text = clientMap.get(text).poll();
+               } else {
+                text = "";
+                }
             }
         return new Resp(text, status);
     }
@@ -29,36 +33,50 @@ public class TopicService implements Service {
         String paramForSubscriber1 = "client407";
         String paramForSubscriber2 = "client6565";
         TopicService topicService = new TopicService();
+
         /* Режим topic. Подписываемся на топик weather. client407. */
+
         topicService.process(
                 new Req("GET", "topic", "weather", paramForSubscriber1)
         );
+        System.out.println();
+        System.out.println("Режим topic. Подписываемся на топик weather. client407.");
         System.out.println(topicService.listMap);
         System.out.println(topicService.clientMap);
+        System.out.println();
+
         /* Режим topic. Добавляем данные в топик weather. */
         topicService.process(
                 new Req("POST", "topic", "weather", paramForPublisher)
         );
         System.out.println();
+        System.out.println("Режим topic. Добавляем данные в топик weather. ");
         System.out.println(topicService.listMap);
         System.out.println(topicService.clientMap);
+        System.out.println();
+
         /* Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client407. */
         Resp result1 = topicService.process(
                 new Req("GET", "topic", "weather", paramForSubscriber1)
         );
         System.out.println();
+        System.out.println("Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client407.");
         System.out.println(topicService.listMap);
         System.out.println(topicService.clientMap);
         System.out.println(result1.text());
+        System.out.println();
         /* Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client6565.
         Очередь отсутствует, т.к. еще не был подписан - получит пустую строку */
         Resp result2 = topicService.process(
                 new Req("GET", "topic", "weather", paramForSubscriber2)
         );
         System.out.println();
+        System.out.println("Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client6565.\n"
+                + " " +   "Очередь отсутствует, т.к. еще не был подписан - получит пустую строку");
         System.out.println(topicService.listMap);
         System.out.println(topicService.clientMap);
         System.out.println(result2.text());
+        System.out.println();
 
 
     }
