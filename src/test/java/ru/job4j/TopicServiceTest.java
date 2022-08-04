@@ -41,8 +41,8 @@ public class TopicServiceTest {
         Req req2 = new Req("POST", "topic", "weather", "temp=35");
         Resp resp = service.process(req);
         Resp resp2 = service.process(req2);
-        assertThat(resp.text(), is("message posted successfully"));
-        assertThat(resp2.text(), is("message posted successfully"));
+        assertThat(resp.text(), is("temp=30"));
+        assertThat(resp2.text(), is("temp=35"));
     }
 
     @Test
