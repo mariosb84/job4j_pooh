@@ -16,14 +16,16 @@ public class TopicService implements Service {
             listMapText = text;
             listMap.put(topicName, listMapText);
         } else {
-            listMap.putIfAbsent(topicName, listMapText);
-            clientMap.putIfAbsent(text, new ConcurrentLinkedQueue<>());
             if (clientMap.containsKey(text)) {
                 clientMap.get(text).add(listMap.get(topicName));
-                text = clientMap.get(text).poll();
-               } else {
-                text = "";
-                }
+                listMapText = clientMap.get(text).poll();
+            }
+            listMap.putIfAbsent(topicName, listMapText);
+            clientMap.putIfAbsent(text, new ConcurrentLinkedQueue<>());
+            if (listMapText == null) {
+                listMapText = "";
+            }
+            text = listMapText;
             }
         return new Resp(text, status);
     }
@@ -63,7 +65,7 @@ public class TopicService implements Service {
         System.out.println("Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client407.");
         System.out.println(topicService.listMap);
         System.out.println(topicService.clientMap);
-        System.out.println(result1.text());
+        System.out.println(result1.text() + " result");
         System.out.println();
         /* Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client6565.
         Очередь отсутствует, т.к. еще не был подписан - получит пустую строку */
@@ -75,7 +77,7 @@ public class TopicService implements Service {
                 + " " +   "Очередь отсутствует, т.к. еще не был подписан - получит пустую строку");
         System.out.println(topicService.listMap);
         System.out.println(topicService.clientMap);
-        System.out.println(result2.text());
+        System.out.println(result2.text() + " result");
         System.out.println();
 
 
