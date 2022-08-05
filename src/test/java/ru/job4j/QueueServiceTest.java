@@ -23,7 +23,7 @@ public class QueueServiceTest {
     }
 
     @Test
-    public void testOfPosting2Messages() {
+    public void testOfPostingTwoMessages() {
         Service service = new QueueService();
         Req req = new Req("POST", "queue", "weather", "temp=30");
         Req req2 = new Req("POST", "queue", "weather", "temp=35");
@@ -34,7 +34,7 @@ public class QueueServiceTest {
     }
 
     @Test
-    public void testOfPosting3MessagesDiffThemesAnd3GetRequests() {
+    public void testOfPostingThreeMessagesAndThreeGetRequests() {
         Service service = new QueueService();
         service.process(new Req("POST", "queue", "weather", "temp=30"));
         service.process(new Req("POST", "queue", "weather", "temp=35"));
