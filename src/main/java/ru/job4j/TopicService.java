@@ -4,29 +4,37 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TopicService implements Service {
-    ConcurrentHashMap<String, String> listMap = new ConcurrentHashMap<>();
-    ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> clientMap = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, ConcurrentHashMap<String,
+            ConcurrentLinkedQueue<String>>> topicMap = new ConcurrentHashMap<>();
+
     @Override
     public Resp process(Req req) {
         String topicName = req.getSourceName();
         String text = req.getParam();
         String status = "200";
         String listMapText = "";
-        if ("POST".equals(req.httpRequestType()) && listMap.containsKey(topicName)) {
-            listMapText = text;
-            listMap.put(topicName, listMapText);
-        } else {
-            if (clientMap.containsKey(text)) {
-                clientMap.get(text).add(listMap.get(topicName));
-                listMapText = clientMap.get(text).poll();
+        if ("GET".equals(req.httpRequestType())) {
+            if (topicMap.containsKey(topicName)
+                    && topicMap.get(topicName) != null
+                    && topicMap.get(topicName).containsKey(text)
+                    && topicMap.get(topicName).get(text) != null) {
+                listMapText = topicMap.get(topicName).get(text).poll();
             }
-            listMap.putIfAbsent(topicName, listMapText);
-            clientMap.putIfAbsent(text, new ConcurrentLinkedQueue<>());
+            topicMap.putIfAbsent(topicName, new ConcurrentHashMap<>());
+            topicMap.get(topicName).putIfAbsent(text, new ConcurrentLinkedQueue<>());
             if (listMapText == null) {
                 listMapText = "";
-               }
-            text = listMapText;
+                status = "204";
             }
+            text = listMapText;
+        }
+        if ("POST".equals(req.httpRequestType())
+                && topicMap.containsKey(topicName)) {
+            listMapText = text;
+            for (String s : topicMap.get(topicName).keySet()) {
+                topicMap.get(topicName).get(s).add(listMapText);
+            }
+        }
         return new Resp(text, status);
     }
 }

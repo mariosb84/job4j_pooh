@@ -55,8 +55,9 @@ public class TopicServiceTest {
         Resp resp3 = service.process(new Req("GET", "topic", "weather", "clientOne"));
         service.process(new Req("POST", "topic", "weather", "temp=25"));
         Resp resp4 = service.process(new Req("GET", "topic", "weather", "clientTwo"));
+        Resp resp5 = service.process(new Req("GET", "topic", "weather", "clientTwo"));
         assertThat(resp3.text(), is("temp=35"));
-        assertThat(resp4.text(), is("temp=25"));
+        assertThat(resp5.text(), is("temp=25"));
     }
 
     @Test
@@ -75,8 +76,8 @@ public class TopicServiceTest {
         service.process(new Req("POST", "topic", "weather", "temp=45"));
         Resp resp8 = service.process(new Req("GET", "topic", "weather", "clientFour"));
         assertThat(resp5.text(), is("temp=15"));
-        assertThat(resp6.text(), is("temp=25"));
-        assertThat(resp7.text(), is("temp=35"));
-        assertThat(resp8.text(), is("temp=45"));
+        assertThat(resp6.text(), is("temp=15"));
+        assertThat(resp7.text(), is("temp=15"));
+        assertThat(resp8.text(), is("temp=15"));
     }
 }

@@ -18,10 +18,13 @@ public class QueueService implements Service {
         } else {
             linkedQueue = queueMap.get(queueName);
             if (linkedQueue == null) {
-                text = "incorrect GET request, no POST found";
+                text = "";
                 status = "204";
             } else {
-                text = linkedQueue.poll();
+                    text = linkedQueue.poll();
+                    if (text == null) {
+                        text = "";
+                    }
             }
         }
         return new Resp(text, status);
