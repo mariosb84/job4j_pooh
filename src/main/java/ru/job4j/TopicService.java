@@ -14,25 +14,23 @@ public class TopicService implements Service {
         String status = "200";
         String listMapText = "";
         if ("GET".equals(req.httpRequestType())) {
-            if (topicMap.containsKey(topicName)
-                    && topicMap.get(topicName) != null
-                    && topicMap.get(topicName).containsKey(text)
-                    && topicMap.get(topicName).get(text) != null) {
-                listMapText = topicMap.get(topicName).get(text).poll();
-            }
             topicMap.putIfAbsent(topicName, new ConcurrentHashMap<>());
             topicMap.get(topicName).putIfAbsent(text, new ConcurrentLinkedQueue<>());
+            listMapText = topicMap.get(topicName).get(text).poll();
             if (listMapText == null) {
                 listMapText = "";
                 status = "204";
             }
             text = listMapText;
         }
-        if ("POST".equals(req.httpRequestType())
-                && topicMap.containsKey(topicName)) {
+        if ("POST".equals(req.httpRequestType())) {
             listMapText = text;
-            for (String s : topicMap.get(topicName).keySet()) {
-                topicMap.get(topicName).get(s).add(listMapText);
+            ConcurrentHashMap<String, ConcurrentLinkedQueue<String>>
+                    topic = topicMap.get(topicName);
+            if (topic != null) {
+                for (String s : topic.keySet()) {
+                    topic.get(s).add(listMapText);
+                }
             }
         }
         return new Resp(text, status);
