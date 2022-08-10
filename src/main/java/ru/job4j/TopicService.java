@@ -12,7 +12,7 @@ public class TopicService implements Service {
         String topicName = req.getSourceName();
         String text = req.getParam();
         String status = "200";
-        String listMapText = "";
+        String listMapText;
         if ("GET".equals(req.httpRequestType())) {
             topicMap.putIfAbsent(topicName, new ConcurrentHashMap<>());
             topicMap.get(topicName).putIfAbsent(text, new ConcurrentLinkedQueue<>());
@@ -28,8 +28,8 @@ public class TopicService implements Service {
             ConcurrentHashMap<String, ConcurrentLinkedQueue<String>>
                     topic = topicMap.get(topicName);
             if (topic != null) {
-                for (String s : topic.keySet()) {
-                    topic.get(s).add(listMapText);
+                for (ConcurrentLinkedQueue<String> queue : topic.values()) {
+                    queue.add(listMapText);
                 }
             }
         }
